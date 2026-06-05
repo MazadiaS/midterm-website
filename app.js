@@ -15,6 +15,7 @@ const state = {
   current: 0,     // current question index in flat list
   student: { name: "", group: "" },
   finished: false,
+  tabSwitches: 0, // anti-cheat: count of times the student left the tab
 };
 
 const el = {
@@ -125,7 +126,82 @@ function startExam(resume) {
   renderGrid();
   goTo(state.current);
   startTimer(resume);
+  installAntiCheat();
   persist();
+}
+
+/* ============= Anti-cheat ============= */
+function isExamActive() {
+  return !state.finished && document.getElementById("exam").classList.contains("active");
+}
+
+function installAntiCheat() {
+  // Block right-click during exam
+  document.addEventListener("contextmenu", e => {
+    if (isExamActive()) e.preventDefault();
+  });
+
+  // Block copy / cut from the question area (not from inputs — students must be able to edit)
+  document.addEventListener("copy", e => {
+    if (isExamActive() && !isEditable(e.target)) e.preventDefault();
+  });
+  document.addEventListener("cut", e => {
+    if (isExamActive() && !isEditable(e.target)) e.preventDefault();
+  });
+
+  // Block paste in answer inputs (so students cannot paste prepared answers)
+  document.addEventListener("paste", e => {
+    if (isExamActive() && isEditable(e.target)) {
+      e.preventDefault();
+      flashWarning("Pasting is not allowed during the exam.");
+    }
+  });
+
+  // Block keyboard shortcuts: Ctrl+C / Ctrl+V / Ctrl+X / Ctrl+A / F12 / Cmd+Option+I
+  document.addEventListener("keydown", e => {
+    if (!isExamActive()) return;
+    const k = e.key.toLowerCase();
+    const ctrl = e.ctrlKey || e.metaKey;
+    if (ctrl && ["c", "v", "x", "a", "s", "p"].includes(k) && !isEditable(e.target)) {
+      e.preventDefault();
+    }
+    if (ctrl && ["v"].includes(k) && isEditable(e.target)) {
+      e.preventDefault();
+      flashWarning("Pasting is not allowed during the exam.");
+    }
+    // DevTools shortcuts
+    if (e.key === "F12") e.preventDefault();
+    if (ctrl && e.shiftKey && ["i", "j", "c"].includes(k)) e.preventDefault();
+  });
+
+  // Tab-switch / window-blur detection
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && isExamActive()) {
+      state.tabSwitches++;
+      persist();
+      flashWarning(`You left the exam tab. This was recorded (${state.tabSwitches} time${state.tabSwitches === 1 ? "" : "s"}).`);
+    }
+  });
+}
+
+function isEditable(target) {
+  if (!target) return false;
+  const tag = target.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || target.isContentEditable;
+}
+
+function flashWarning(msg) {
+  let toast = document.getElementById("anticheat-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "anticheat-toast";
+    toast.className = "anticheat-toast";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = "⚠ " + msg;
+  toast.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toast.classList.remove("show"), 2500);
 }
 
 /* ============= Timer ============= */
@@ -325,6 +401,7 @@ function sendToSheet(results, timeUsedMin) {
     sectionB: `${results.sectionScores.B.earned} / ${results.sectionScores.B.possible}`,
     timeUsedMin: timeUsedMin,
     grade: gradeLetter(results.totalEarned, results.totalPossible),
+    tabSwitches: state.tabSwitches,
     answers: answers,
   };
 
@@ -364,26 +441,62 @@ function renderResults({ totalEarned, totalPossible, sectionScores, breakdown })
   el.sectionAScore.textContent = `${sectionScores.A.earned} / ${sectionScores.A.possible}`;
   el.sectionBScore.textContent = `${sectionScores.B.earned} / ${sectionScores.B.possible}`;
 
+  // Pass / Fail verdict (min passing score = 65)
+  const PASS_MARK = 65;
+  const passFailEl = document.getElementById("pass-fail-badge");
+  const failMsgEl = document.getElementById("fail-message");
+  const passed = totalEarned >= PASS_MARK;
+  passFailEl.textContent = passed ? "PASS" : "FAIL";
+  passFailEl.className = `pass-fail ${passed ? "passed" : "failed"}`;
+  if (!passed) {
+    const need = PASS_MARK - totalEarned;
+    failMsgEl.style.display = "block";
+    failMsgEl.textContent = `You needed ${need} more point${need === 1 ? "" : "s"} to pass. Review the wrong answers below — every explanation tells you why.`;
+  } else {
+    failMsgEl.style.display = "none";
+  }
+
   const grade = gradeLetter(totalEarned, totalPossible);
-  el.gradeBadge.textContent = grade;
+  el.gradeBadge.textContent = `Grade: ${grade}`;
   el.gradeBadge.className = `grade ${grade}`;
 
   el.breakdown.innerHTML = breakdown.map(({ q, earned }) => {
     const status = earned === q.points ? "correct" : earned === 0 ? "wrong" : "partial";
     const yourAnswer = formatStudentAnswer(q);
     const correctAnswer = formatCorrectAnswer(q);
+    const icon = status === "correct" ? "✓" : status === "partial" ? "◐" : "✗";
+    const label = status === "correct" ? "Correct" : status === "partial" ? "Partial" : "Wrong";
+
+    const yourRow = `<div class="answer-row ${status === "correct" ? "your-correct" : "your-wrong"}">
+        <span class="answer-tag">Your answer</span>
+        <code>${yourAnswer || "— (skipped)"}</code>
+      </div>`;
+
+    const correctRow = status !== "correct" ? `<div class="answer-row your-right">
+        <span class="answer-tag">Correct answer</span>
+        <code>${correctAnswer}</code>
+      </div>` : "";
+
+    const whyBlock = (status !== "correct" && q.explanation)
+      ? `<div class="why-block">
+           <span class="why-label">💡 Why this is the right answer:</span>
+           ${escape(q.explanation)}
+         </div>`
+      : (status === "correct" && q.explanation)
+        ? `<div class="why-block small-why">${escape(q.explanation)}</div>`
+        : "";
+
     return `
       <div class="b-row ${status}">
-        <div class="b-num">${q.id}</div>
-        <div class="b-q">
-          <strong>${escape(q.question).replace(/\n/g, "<br>")}</strong>
-          <span class="explain">
-            Your answer: <code>${yourAnswer || "—"}</code>
-            ${status !== "correct" ? `· Correct: <code>${correctAnswer}</code>` : ""}
-            ${q.explanation ? `<br><em>${escape(q.explanation)}</em>` : ""}
-          </span>
+        <div class="b-header">
+          <div class="b-num">Q${q.id} <span class="status-icon">${icon}</span></div>
+          <div class="b-status-label">${label}</div>
+          <div class="b-pts">${earned} / ${q.points}</div>
         </div>
-        <div class="b-pts">${earned} / ${q.points}</div>
+        <div class="b-q-text">${escape(q.question).replace(/\n/g, "<br>")}</div>
+        ${yourRow}
+        ${correctRow}
+        ${whyBlock}
       </div>
     `;
   }).join("");
@@ -418,6 +531,7 @@ function persist() {
     answers: state.answers,
     current: state.current,
     finished: state.finished,
+    tabSwitches: state.tabSwitches,
   }));
 }
 
