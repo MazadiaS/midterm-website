@@ -4,8 +4,8 @@
    autosaves to localStorage, grades on submit.
    ============================================================ */
 
-const STORAGE_KEY = "midterm_state_v1";
-const TIMER_KEY = "midterm_timer_end_v1";
+const STORAGE_KEY = "midterm_state_v3";
+const TIMER_KEY = "midterm_timer_end_v3";
 const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwPbJZkcRfVXwJ3cbSSd3CbefvxWF1qMoZQJlnPkMQ_twEkegnUpXq5ojNYuPXw8U8/exec";
 
 const state = {
@@ -94,6 +94,11 @@ async function boot() {
   el.studentName.addEventListener("input", validateStart);
   el.studentGroup.addEventListener("input", validateStart);
   el.startBtn.addEventListener("click", () => {
+    // Defensive: ensure a completely fresh state for a brand-new attempt
+    state.answers = {};
+    state.current = 0;
+    state.tabSwitches = 0;
+    state.finished = false;
     state.student.name = el.studentName.value.trim();
     state.student.group = el.studentGroup.value.trim();
     startExam(false);
@@ -289,8 +294,12 @@ function renderQuestion() {
   if (q.type === "mcq") {
     el.questionContainer.querySelectorAll("input[type=radio]").forEach(r => {
       r.addEventListener("change", e => {
-        state.answers[q.id] = parseInt(e.target.value, 10);
-        renderQuestion(); // re-render to update selected highlight
+        const picked = parseInt(e.target.value, 10);
+        state.answers[q.id] = picked;
+        // Update only the visual selection — do NOT re-render (destroys DOM)
+        el.questionContainer.querySelectorAll(".option").forEach(lbl => lbl.classList.remove("selected"));
+        const lbl = e.target.closest(".option");
+        if (lbl) lbl.classList.add("selected");
         renderGrid();
         persist();
       });
@@ -366,10 +375,16 @@ function grade() {
   const sectionScores = {};
   const breakdown = [];
 
+  // Debug — let us see what is in state.answers when grading
+  console.log("[grade] state.answers =", JSON.parse(JSON.stringify(state.answers)));
+
   for (const section of state.data.sections) {
     sectionScores[section.id] = { earned: 0, possible: 0 };
     for (const q of section.questions) {
       const earned = scoreQuestion(q);
+      if (q.type === "mcq") {
+        console.log(`[grade] Q${q.id}: stored=${JSON.stringify(state.answers[q.id])} (${typeof state.answers[q.id]}) | correct=${q.correct} | earned=${earned}`);
+      }
       sectionScores[section.id].earned += earned;
       sectionScores[section.id].possible += q.points;
       totalEarned += earned;
@@ -378,6 +393,7 @@ function grade() {
     }
   }
 
+  console.log(`[grade] Total: ${totalEarned} / ${totalPossible}`);
   return { totalEarned, totalPossible, sectionScores, breakdown };
 }
 
