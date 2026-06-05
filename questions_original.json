@@ -1,0 +1,264 @@
+{
+  "title": "AI/ML Midterm — Modules 1–3",
+  "subtitle": "Uzbekistan Digital Inclusion · AI/ML Track (Tashkent)",
+  "duration_minutes": 90,
+  "total_points": 100,
+  "sections": [
+    {
+      "id": "A",
+      "name": "Section A — Multiple Choice",
+      "instructions": "Choose ONE correct answer. Each question is worth 2 points.",
+      "questions": [
+        { "id": 1, "type": "mcq", "points": 2, "difficulty": "easy",
+          "question": "Which symbol starts a comment in Python?",
+          "options": ["//", "/*", "#", "--"], "correct": 2,
+          "explanation": "Python uses # to start a single-line comment." },
+
+        { "id": 2, "type": "mcq", "points": 2, "difficulty": "easy",
+          "question": "What does df.head() show?",
+          "options": ["The last 5 rows", "The first 5 rows", "Only column names", "Total number of rows"],
+          "correct": 1,
+          "explanation": "df.head() returns the first 5 rows by default." },
+
+        { "id": 3, "type": "mcq", "points": 2, "difficulty": "easy",
+          "question": "What does df.shape return?",
+          "options": ["Only number of columns", "Only number of rows", "A tuple (rows, columns)", "The data types"],
+          "correct": 2,
+          "explanation": "df.shape returns a (rows, columns) tuple." },
+
+        { "id": 4, "type": "mcq", "points": 2, "difficulty": "easy",
+          "question": "Which library is used to work with data tables in Python?",
+          "options": ["numpy", "pandas", "matplotlib", "sklearn"], "correct": 1,
+          "explanation": "pandas is the data-table library; numpy is for arrays." },
+
+        { "id": 5, "type": "mcq", "points": 2, "difficulty": "easy",
+          "question": "What does np.mean([2, 4, 6]) return?",
+          "options": ["2", "4", "6", "12"], "correct": 1,
+          "explanation": "(2 + 4 + 6) / 3 = 4." },
+
+        { "id": 6, "type": "mcq", "points": 2, "difficulty": "easy",
+          "question": "Which function reads a CSV file in pandas?",
+          "options": ["pd.read_csv()", "pd.open_csv()", "pd.load_csv()", "csv.read()"], "correct": 0,
+          "explanation": "pd.read_csv() is the standard CSV reader." },
+
+        { "id": 7, "type": "mcq", "points": 2, "difficulty": "medium",
+          "question": "When you use sklearn's built-in datasets (like load_iris), which is true?",
+          "options": ["You need internet", "You need a Kaggle account", "No download is needed", "You need to upload a file"],
+          "correct": 2,
+          "explanation": "sklearn's built-in datasets ship with the library." },
+
+        { "id": 8, "type": "mcq", "points": 2, "difficulty": "easy",
+          "question": "Why do we split data into train and test?",
+          "options": ["To save memory", "To make training faster", "To check the model honestly on data it has never seen", "To use less data"],
+          "correct": 2,
+          "explanation": "The test set is the honest exam — data the model never saw during training." },
+
+        { "id": 9, "type": "mcq", "points": 2, "difficulty": "easy",
+          "question": "In train_test_split(X, y, test_size=0.25), what is the train size?",
+          "options": ["25%", "50%", "75%", "100%"], "correct": 2,
+          "explanation": "test_size=0.25 means 25% test, so 75% train." },
+
+        { "id": 10, "type": "mcq", "points": 2, "difficulty": "medium",
+          "question": "What does random_state=42 do?",
+          "options": ["Makes the model run faster", "Makes the split the SAME every time you run the code", "Sets accuracy to a fixed value", "Reduces overfitting automatically"],
+          "correct": 1,
+          "explanation": "random_state fixes the random seed for reproducibility." },
+
+        { "id": 11, "type": "mcq", "points": 2, "difficulty": "hard",
+          "question": "If you test a model on the SAME data it was trained on, what happens?",
+          "options": ["The score will be too LOW", "The score will be too HIGH (the model already saw the answers)", "The score will be exactly right", "The model will not train at all"],
+          "correct": 1,
+          "explanation": "Testing on training data is cheating — the model has seen the answers, so the score is overoptimistic. This is the core reason we hold out a test set." },
+
+        { "id": 12, "type": "mcq", "points": 2, "difficulty": "medium",
+          "question": "Which model does NOT need feature scaling?",
+          "options": ["KNN", "Logistic Regression", "Random Forest", "SVM"], "correct": 2,
+          "explanation": "Tree-based models split on thresholds, so the scale of features does not matter." },
+
+        { "id": 13, "type": "mcq", "points": 2, "difficulty": "medium",
+          "question": "Why does a Decision Tree NOT need scaling?",
+          "options": ["Trees only use Yes/No questions — the scale does not matter", "Trees compute distances between rows", "Trees use random numbers", "Trees use linear math"],
+          "correct": 0,
+          "explanation": "Tree splits like x > 5 work the same way at any scale." },
+
+        { "id": 14, "type": "mcq", "points": 2, "difficulty": "easy",
+          "question": "Linear Regression predicts:",
+          "options": ["Yes / No", "A number", "A category", "A picture"], "correct": 1,
+          "explanation": "Linear Regression is for predicting continuous numbers." },
+
+        { "id": 15, "type": "mcq", "points": 2, "difficulty": "easy",
+          "question": "Logistic Regression predicts:",
+          "options": ["A number", "Yes / No (two classes)", "An average value", "The minimum"],
+          "correct": 1,
+          "explanation": "Despite the name, Logistic Regression is for classification." },
+
+        { "id": 16, "type": "mcq", "points": 2, "difficulty": "medium",
+          "question": "A Decision Tree makes predictions by:",
+          "options": ["Computing one complex formula", "Asking a series of Yes/No questions", "Comparing with the nearest neighbors", "Averaging all training values"],
+          "correct": 1,
+          "explanation": "A tree walks down a chain of yes/no questions to reach a leaf." },
+
+        { "id": 17, "type": "mcq", "points": 2, "difficulty": "medium",
+          "question": "Random Forest is:",
+          "options": ["One very deep decision tree", "Many decision trees voting together", "A type of linear model", "A clustering algorithm"],
+          "correct": 1,
+          "explanation": "A 'forest' = many trees combined by voting/averaging." },
+
+        { "id": 18, "type": "mcq", "points": 2, "difficulty": "hard",
+          "question": "A Decision Tree picks the BEST split by choosing the question that:",
+          "options": ["Uses the column with the highest average", "Makes the two groups the CLEANEST (lowest Gini)", "Splits the data exactly in half", "Uses the median of the column"],
+          "correct": 1,
+          "explanation": "The tree tries every possible split and picks the one with the lowest Gini (cleanest groups)." },
+
+        { "id": 19, "type": "mcq", "points": 2, "difficulty": "hard",
+          "question": "Why is Random Forest more stable than a single Decision Tree?",
+          "options": ["Forests train faster", "Many trees vote and cancel out each other's mistakes", "Forests do not need training data", "Forests use linear math"],
+          "correct": 1,
+          "explanation": "Bagging: errors of individual trees average out when many trees vote." },
+
+        { "id": 20, "type": "mcq", "points": 2, "difficulty": "easy",
+          "question": "MAE stands for:",
+          "options": ["Mean Average Error", "Mean Absolute Error", "Maximum Absolute Error", "Minimum Average Error"],
+          "correct": 1,
+          "explanation": "MAE = Mean Absolute Error." },
+
+        { "id": 21, "type": "mcq", "points": 2, "difficulty": "easy",
+          "question": "Lower MAE means:",
+          "options": ["Worse model", "Better model (smaller mistakes)", "Faster model", "Bigger model"],
+          "correct": 1,
+          "explanation": "Lower error = better predictions." },
+
+        { "id": 22, "type": "mcq", "points": 2, "difficulty": "hard",
+          "question": "If MAE = 5 and RMSE = 15 for the same model, what does this tell you?",
+          "options": ["The model is perfect", "Most mistakes are small, but at least one is HUGE", "The model is overfitting", "The data needs scaling"],
+          "correct": 1,
+          "explanation": "A large gap RMSE >> MAE means uneven errors — one or more big mistakes are pulling RMSE up." },
+
+        { "id": 23, "type": "mcq", "points": 2, "difficulty": "hard",
+          "question": "R² = 0 means:",
+          "options": ["The model is perfect", "The model has zero errors", "The model is no better than just guessing the average", "The model uses zero features"],
+          "correct": 2,
+          "explanation": "R² = 0 means your model performs the same as the lazy 'always-the-average' model." },
+
+        { "id": 24, "type": "mcq", "points": 2, "difficulty": "easy",
+          "question": "Accuracy is:",
+          "options": ["The percent of RIGHT predictions", "The percent of WRONG predictions", "Same as recall", "The size of the dataset"],
+          "correct": 0,
+          "explanation": "Accuracy = correct / total." },
+
+        { "id": 25, "type": "mcq", "points": 2, "difficulty": "medium",
+          "question": "When does accuracy LIE?",
+          "options": ["When the data is balanced (50/50)", "When the data is IMBALANCED (one class is rare)", "When you use Random Forest", "When the model is too small"],
+          "correct": 1,
+          "explanation": "On imbalanced data, a model that always predicts the majority class looks great by accuracy but is useless." },
+
+        { "id": 26, "type": "mcq", "points": 2, "difficulty": "medium",
+          "question": "Precision answers:",
+          "options": ["How many real YES cases did we catch?", "When the model says YES, how often is it right?", "What is the average prediction?", "How big is the data?"],
+          "correct": 1,
+          "explanation": "Precision = TP / (TP + FP)." },
+
+        { "id": 27, "type": "mcq", "points": 2, "difficulty": "medium",
+          "question": "Recall answers:",
+          "options": ["When the model says YES, how often is it right?", "Of all real YES cases, how many did we catch?", "Training speed", "Number of features"],
+          "correct": 1,
+          "explanation": "Recall = TP / (TP + FN)." },
+
+        { "id": 28, "type": "mcq", "points": 2, "difficulty": "hard",
+          "question": "For cancer detection, which metric matters MOST?",
+          "options": ["Accuracy", "Precision", "Recall", "Training time"], "correct": 2,
+          "explanation": "Missing a real cancer case (false negative) is the most costly mistake — so we maximise recall." },
+
+        { "id": 29, "type": "mcq", "points": 2, "difficulty": "hard",
+          "question": "F1 score is high only when:",
+          "options": ["Accuracy is high", "Either precision OR recall is high", "BOTH precision AND recall are high", "The model is fast"],
+          "correct": 2,
+          "explanation": "F1 is the harmonic mean — it pulls down to the smaller of precision and recall." },
+
+        { "id": 30, "type": "mcq", "points": 2, "difficulty": "hard",
+          "question": "Look at this confusion matrix (row = real, col = predicted; class 1 = PASS):\n[[40, 10],\n [ 5, 45]]\nWhat is the accuracy?",
+          "options": ["0.40", "0.85", "0.90", "0.95"], "correct": 1,
+          "explanation": "Correct = 40 + 45 = 85. Total = 100. Accuracy = 0.85." }
+      ]
+    },
+    {
+      "id": "B",
+      "name": "Section B — Fill in the Blanks",
+      "instructions": "Write your answer in the box. One word or a short phrase is enough.",
+      "questions": [
+        { "id": 31, "type": "fill", "points": 4, "difficulty": "easy",
+          "question": "The function in sklearn that splits the data into train and test parts is called:",
+          "blanks": [
+            { "accepts": ["train_test_split", "train test split"], "points": 4, "placeholder": "function name" }
+          ],
+          "explanation": "from sklearn.model_selection import train_test_split" },
+
+        { "id": 32, "type": "fill", "points": 4, "difficulty": "easy",
+          "question": "In model.fit(X, y), the variable X is the [BLANK 1] and y is the [BLANK 2].",
+          "blanks": [
+            { "accepts": ["features", "feature", "clues", "clue", "inputs", "input"], "points": 2, "placeholder": "X is..." },
+            { "accepts": ["target", "label", "answer", "labels", "targets", "answers"], "points": 2, "placeholder": "y is..." }
+          ],
+          "explanation": "X = features/clues, y = target/label." },
+
+        { "id": 33, "type": "fill", "points": 4, "difficulty": "medium",
+          "question": "Complete the import line:\nfrom [BLANK 1] import [BLANK 2]\n(to bring LogisticRegression from sklearn)",
+          "blanks": [
+            { "accepts": ["sklearn.linear_model"], "points": 2, "placeholder": "module path" },
+            { "accepts": ["LogisticRegression"], "points": 2, "placeholder": "class name", "case_sensitive": true }
+          ],
+          "explanation": "from sklearn.linear_model import LogisticRegression" },
+
+        { "id": 34, "type": "fill", "points": 4, "difficulty": "medium",
+          "question": "A model that does NOT learn anything and always predicts the same value (like always 'not spam') is called the ___ model. (Starts with L or B.)",
+          "blanks": [
+            { "accepts": ["lazy", "baseline", "dummy"], "points": 4, "placeholder": "one word" }
+          ],
+          "explanation": "We call it the lazy / baseline / dummy model — the floor that real models must beat." },
+
+        { "id": 35, "type": "fill", "points": 4, "difficulty": "medium",
+          "question": "If 95 emails are normal and only 5 are spam, the data is ___ (one word).",
+          "blanks": [
+            { "accepts": ["imbalanced", "unbalanced"], "points": 4, "placeholder": "one word" }
+          ],
+          "explanation": "Imbalanced data — one class is much rarer than the other." },
+
+        { "id": 36, "type": "fill", "points": 4, "difficulty": "medium",
+          "question": "Fill in the missing word: 'RMSE is similar to MAE, but it ___ big mistakes (counts them extra).'",
+          "blanks": [
+            { "accepts": ["punishes", "penalizes", "penalises", "punish", "punishs"], "points": 4, "placeholder": "verb" }
+          ],
+          "explanation": "RMSE punishes/penalizes big mistakes because of the squaring step." },
+
+        { "id": 37, "type": "fill", "points": 4, "difficulty": "hard",
+          "question": "Look at this confusion matrix (row 0 = really NO, row 1 = really YES):\n[[40, 10],\n [ 5, 45]]\n[BLANK 1] = number of false alarms (FP)\n[BLANK 2] = number of missed cases (FN)",
+          "blanks": [
+            { "accepts": ["10"], "points": 2, "placeholder": "FP" },
+            { "accepts": ["5"], "points": 2, "placeholder": "FN" }
+          ],
+          "explanation": "FP = top-right = 10. FN = bottom-left = 5." },
+
+        { "id": 38, "type": "fill", "points": 4, "difficulty": "hard",
+          "question": "A model with R² = 0.80 explains ___ % of the answer.",
+          "blanks": [
+            { "accepts": ["80", "80%"], "points": 4, "placeholder": "number" }
+          ],
+          "explanation": "R² is a percentage. 0.80 = 80%." },
+
+        { "id": 39, "type": "fill", "points": 4, "difficulty": "hard",
+          "question": "Complete the Python code:\nfrom sklearn.metrics import accuracy_score\nscore = ___(y_true, y_pred)",
+          "blanks": [
+            { "accepts": ["accuracy_score"], "points": 4, "placeholder": "function call", "case_sensitive": true }
+          ],
+          "explanation": "Call the imported function: accuracy_score(y_true, y_pred)." },
+
+        { "id": 40, "type": "fill", "points": 4, "difficulty": "hard",
+          "question": "A bank wants to catch fraud. Missing a real fraud is very dangerous. The bank should care most about the metric called ___.",
+          "blanks": [
+            { "accepts": ["recall"], "points": 4, "placeholder": "metric name" }
+          ],
+          "explanation": "When missing a YES case is costly, recall is the metric to maximise." }
+      ]
+    }
+  ]
+}
