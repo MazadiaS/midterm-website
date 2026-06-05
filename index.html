@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI/ML Midterm</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ============= WELCOME SCREEN ============= -->
+  <section id="welcome" class="screen active">
+    <div class="card">
+      <h1 id="welcome-title">AI/ML Midterm</h1>
+      <p id="welcome-subtitle" class="muted"></p>
+
+      <div class="info-grid">
+        <div><span class="label">Total questions</span><span class="value">40</span></div>
+        <div><span class="label">Total points</span><span class="value">100</span></div>
+        <div><span class="label">Time</span><span class="value">90 min</span></div>
+        <div><span class="label">Sections</span><span class="value">2</span></div>
+      </div>
+
+      <label class="field">
+        <span>Full name</span>
+        <input id="student-name" type="text" placeholder="Type your full name" autocomplete="off" />
+      </label>
+
+      <label class="field">
+        <span>Group</span>
+        <input id="student-group" type="text" placeholder="e.g. AI/ML-Tashkent-2" autocomplete="off" />
+      </label>
+
+      <h3>Rules</h3>
+      <ul class="rules">
+        <li>You have <strong>90 minutes</strong>. When the timer hits zero, the test submits automatically.</li>
+        <li>Section A: <strong>30 multiple-choice</strong> questions (2 points each).</li>
+        <li>Section B: <strong>10 fill-in-the-blank</strong> questions (4 points each).</li>
+        <li>You can move back and forth between questions before submitting.</li>
+        <li>Your answers are saved in the browser, so a refresh will not lose your work.</li>
+        <li>No phones, no notes, no talking.</li>
+      </ul>
+
+      <button id="start-btn" class="btn primary" disabled>Start Exam</button>
+      <p id="start-hint" class="muted small">Enter your name and group to start.</p>
+    </div>
+  </section>
+
+  <!-- ============= EXAM SCREEN ============= -->
+  <section id="exam" class="screen">
+    <header class="exam-header">
+      <div class="exam-header-left">
+        <span class="exam-title">AI/ML Midterm</span>
+        <span id="student-display" class="muted small"></span>
+      </div>
+      <div class="exam-header-center">
+        <div id="timer" class="timer">90:00</div>
+      </div>
+      <div class="exam-header-right">
+        <span id="progress-text" class="muted small">Question 1 / 40</span>
+      </div>
+    </header>
+
+    <main class="exam-body">
+      <div id="question-container" class="question-container">
+        <!-- question rendered by app.js -->
+      </div>
+
+      <div class="exam-controls">
+        <button id="prev-btn" class="btn">← Previous</button>
+        <button id="next-btn" class="btn">Next →</button>
+        <button id="submit-btn" class="btn danger">Submit Exam</button>
+      </div>
+
+      <div class="question-grid" id="question-grid">
+        <!-- 40 numbered buttons rendered by app.js -->
+      </div>
+    </main>
+  </section>
+
+  <!-- ============= RESULTS SCREEN ============= -->
+  <section id="results" class="screen">
+    <div class="card">
+      <h1>Results</h1>
+      <p id="results-student" class="muted"></p>
+
+      <div class="score-hero">
+        <div id="total-score" class="big-score">--</div>
+        <div class="muted">out of 100</div>
+        <div id="grade-badge" class="grade">--</div>
+      </div>
+
+      <div class="section-scores">
+        <div class="section-score">
+          <div class="label">Section A (MCQ)</div>
+          <div id="section-a-score" class="value">-- / 60</div>
+        </div>
+        <div class="section-score">
+          <div class="label">Section B (Fill-in)</div>
+          <div id="section-b-score" class="value">-- / 40</div>
+        </div>
+      </div>
+
+      <h3>Question-by-question breakdown</h3>
+      <div id="breakdown" class="breakdown">
+        <!-- populated by app.js -->
+      </div>
+
+      <div class="results-actions">
+        <button id="retake-btn" class="btn">Take again</button>
+        <button id="print-btn" class="btn">Print result</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= SUBMIT CONFIRM MODAL ============= -->
+  <div id="confirm-modal" class="modal-overlay">
+    <div class="modal">
+      <h2>Submit exam?</h2>
+      <p id="confirm-summary" class="muted"></p>
+      <p>Once you submit, you cannot change your answers.</p>
+      <div class="modal-actions">
+        <button id="confirm-cancel" class="btn">Keep going</button>
+        <button id="confirm-submit" class="btn danger">Yes, submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
