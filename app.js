@@ -6,6 +6,7 @@
 
 const STORAGE_KEY = "midterm_state_v1";
 const TIMER_KEY = "midterm_timer_end_v1";
+const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwPbJZkcRfVXwJ3cbSSd3CbefvxWF1qMoZQJlnPkMQ_twEkegnUpXq5ojNYuPXw8U8/exec";
 
 const state = {
   data: null,
@@ -268,8 +269,16 @@ function submitExam() {
   if (state.finished) return;
   state.finished = true;
   clearInterval(timerInterval);
+
+  // Compute time used before clearing the timer key
+  const endTime = parseInt(localStorage.getItem(TIMER_KEY) || "0", 10);
+  const remainingMs = Math.max(0, endTime - Date.now());
+  const timeUsedMin = Math.round(state.data.duration_minutes - remainingMs / 60000);
   localStorage.removeItem(TIMER_KEY);
-  grade();
+
+  const results = grade();
+  renderResults(results);
+  sendToSheet(results, timeUsedMin);
   persist();
   switchScreen("results");
 }
@@ -293,7 +302,38 @@ function grade() {
     }
   }
 
-  renderResults({ totalEarned, totalPossible, sectionScores, breakdown });
+  return { totalEarned, totalPossible, sectionScores, breakdown };
+}
+
+/* ============= Send to Google Sheet ============= */
+function sendToSheet(results, timeUsedMin) {
+  if (!WEBHOOK_URL) return;
+
+  // Build per-question answers in flat order
+  const answers = state.flat.map(q => {
+    const a = state.answers[q.id];
+    if (q.type === "mcq") return a === undefined ? "" : "ABCD"[a];
+    if (q.type === "fill") return Array.isArray(a) ? a.join(" | ") : "";
+    return "";
+  });
+
+  const payload = {
+    name: state.student.name,
+    group: state.student.group,
+    score: results.totalEarned,
+    sectionA: `${results.sectionScores.A.earned} / ${results.sectionScores.A.possible}`,
+    sectionB: `${results.sectionScores.B.earned} / ${results.sectionScores.B.possible}`,
+    timeUsedMin: timeUsedMin,
+    grade: gradeLetter(results.totalEarned, results.totalPossible),
+    answers: answers,
+  };
+
+  // Fire-and-forget. no-cors so the request is sent even though we can't read the response.
+  fetch(WEBHOOK_URL, {
+    method: "POST",
+    body: JSON.stringify(payload),
+    mode: "no-cors",
+  }).catch(err => console.error("Sheet sync failed:", err));
 }
 
 function scoreQuestion(q) {
