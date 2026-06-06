@@ -351,21 +351,46 @@ function showSubmitModal() {
 }
 
 function submitExam() {
-  if (state.finished) return;
-  state.finished = true;
-  clearInterval(timerInterval);
+  if (state.finished) {
+    console.warn("[submit] called but state.finished already true — ignoring");
+    return;
+  }
 
-  // Compute time used before clearing the timer key
-  const endTime = parseInt(localStorage.getItem(TIMER_KEY) || "0", 10);
-  const remainingMs = Math.max(0, endTime - Date.now());
-  const timeUsedMin = Math.round(state.data.duration_minutes - remainingMs / 60000);
-  localStorage.removeItem(TIMER_KEY);
+  // Always hide the confirm modal first — even if anything below throws,
+  // the student must never be stuck behind an invisible overlay.
+  el.confirmModal.classList.remove("active");
 
-  const results = grade();
-  renderResults(results);
-  sendToSheet(results, timeUsedMin);
-  persist();
-  switchScreen("results");
+  try {
+    console.log("[submit] starting submission");
+    clearInterval(timerInterval);
+
+    // Compute time used before clearing the timer key
+    const endTime = parseInt(localStorage.getItem(TIMER_KEY) || "0", 10);
+    const remainingMs = Math.max(0, endTime - Date.now());
+    const timeUsedMin = Math.round(state.data.duration_minutes - remainingMs / 60000);
+    localStorage.removeItem(TIMER_KEY);
+
+    const results = grade();
+    console.log("[submit] grading complete");
+    state.finished = true;            // mark finished ONLY after grading succeeds
+    renderResults(results);
+    console.log("[submit] results rendered");
+    sendToSheet(results, timeUsedMin);
+    persist();
+    switchScreen("results");
+    console.log("[submit] switched to results screen");
+  } catch (err) {
+    console.error("[submit] FAILED:", err);
+    // Roll back the finished flag so the student can try again
+    state.finished = false;
+    // Make sure no overlay is blocking anything
+    el.confirmModal.classList.remove("active");
+    // Show a visible error so the student knows what's going on
+    alert("Something went wrong submitting your exam.\n\n" +
+          "Error: " + (err && err.message ? err.message : err) +
+          "\n\nYour answers are still saved. Please try clicking Submit again. " +
+          "If this keeps happening, take a screenshot of this message and tell your mentor.");
+  }
 }
 
 /* ============= Grading ============= */
